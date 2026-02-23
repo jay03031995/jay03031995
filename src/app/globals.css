@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #E32626;
+  --color-primary-hover: #c91e1e;
+  --color-background-light: #f5f7f8;
+  --color-background-dark: #121330;
+  --color-card-dark: #1a1b41;
+  --color-border-dark: #2c2d5e;
+  --color-text-light: #e2e8f0;
+  --color-text-muted: #9fa3c7;
+
+  /* Additional colors from other screens */
+  --color-navy-brand: #151532;
+  --color-navy-dark: #131936;
+  --color-navy-light: #1e264d;
+  --color-surface-dark: #1e293b;
+  --color-surface-darker: #17202b;
+
+  --font-montserrat: "Montserrat", sans-serif;
+  --font-inter: "Inter", sans-serif;
+  --font-space-grotesk: "Space Grotesk", sans-serif;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #121330;
+    --foreground: #e2e8f0;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.glass-panel {
+  background: rgba(18, 19, 48, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-effect {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@layer utilities {
+  .hero-glow {
+    box-shadow: 0 0 100px 20px rgba(227, 38, 38, 0.15);
+  }
+}
