@@ -12,12 +12,12 @@ async function main() {
     update: {},
     create: {
       id: 'cl00000000000000000000000',
-      name: 'Default Tenant',
+      name: 'DermaCare Corp',
       slug: 'default',
     },
   });
 
-  // Create Admin User
+  // Create Users
   const admin = await prisma.user.upsert({
     where: { email: 'admin@example.com' },
     update: {},
@@ -30,49 +30,88 @@ async function main() {
     },
   });
 
-  // Create Categories
-  const tech = await prisma.category.create({
-    data: { name: 'Technology', slug: 'technology', tenantId: tenant.id },
+  const dermatologist = await prisma.user.upsert({
+    where: { email: 'dr.chen@example.com' },
+    update: {},
+    create: {
+      email: 'dr.chen@example.com',
+      name: 'Dr. Sarah Chen, MD',
+      password: hashedPassword,
+      role: 'REVIEWER',
+      tenantId: tenant.id,
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAMlTTSpglFW1T1aaaF0EiKNBygmtBjar8AA7MiP6-jo4iU8otmHmhnJhKyPD04HIJQNkEVjboTqM_bIeAvdmt1ctyOh3DFicnnHIXIpTE0WoabZUh1BsG0gchwyyagGiin9scRDpy9dbZAuvXZkmI6dZxxeg_SVso_CkYipZaVKtCvuR6ETPcTBMmOWgfVg_9dLJsCavZl4lHz9GWpZ_jbFJaUwbz05mlK48vUSw_aXZJJyrF_qQKDCE-imUkmVygWpBqULpPujmXk',
+    },
   });
-  await prisma.category.create({
-    data: { name: 'Design', slug: 'design', tenantId: tenant.id },
+
+  // Create Categories
+  const haircare = await prisma.category.upsert({
+    where: { slug_tenantId: { slug: 'haircare', tenantId: tenant.id } },
+    update: {},
+    create: { name: 'Haircare', slug: 'haircare', tenantId: tenant.id },
+  });
+  const ingredients = await prisma.category.upsert({
+    where: { slug_tenantId: { slug: 'ingredients', tenantId: tenant.id } },
+    update: {},
+    create: { name: 'Ingredients', slug: 'ingredients', tenantId: tenant.id },
   });
 
   // Create Tags
-  const nextjs = await prisma.tag.create({
-    data: { name: 'Next.js', slug: 'nextjs', tenantId: tenant.id },
-  });
-  const tailwind = await prisma.tag.create({
-    data: { name: 'Tailwind CSS', slug: 'tailwind', tenantId: tenant.id },
+  const psoriasis = await prisma.tag.upsert({
+    where: { slug_tenantId: { slug: 'psoriasis', tenantId: tenant.id } },
+    update: {},
+    create: { name: 'Psoriasis', slug: 'psoriasis', tenantId: tenant.id },
   });
 
   // Create Sample Post
   await prisma.post.create({
     data: {
-      title: 'Building a Scalable Blog with Next.js 14',
-      slug: 'building-scalable-blog-nextjs-14',
-      excerpt: 'Learn how to build a production-ready, multi-tenant blog platform using the latest web technologies.',
+      title: 'Coal Tar for Haircare: Uses, Benefits, and Safety Profile',
+      slug: 'coal-tar-haircare-uses-benefits-safety',
+      excerpt: 'Coal tar has been used in dermatology for over a century for stubborn scalp conditions.',
       content: `
-        <h2>Introduction</h2>
-        <p>In today's fast-paced digital world, performance and scalability are key to a successful blog.</p>
-        <h2>Why Next.js?</h2>
-        <p>Next.js provides excellent features like App Router, Server Components, and ISR which are perfect for content-heavy sites.</p>
-        <h2>Database with Prisma</h2>
-        <p>Prisma makes database management a breeze with its type-safe client and easy migrations.</p>
+        <p class="lead">Coal tar has been used in dermatology for over a century. While its name might sound industrial, this byproduct of coal processing remains one of the most effective treatments for stubborn scalp conditions like psoriasis and seborrheic dermatitis.</p>
+        <h2>What is Coal Tar?</h2>
+        <p>Coal tar is a keratolytic agent. In simple terms, it works by slowing the rapid growth of skin cells and restoring the skin's appearance.</p>
+        <div class="my-8 rounded-xl bg-blue-50 p-6 border border-blue-100">
+          <h3 class="flex items-center gap-2 font-bold text-primary text-lg mb-2">Key Takeaways</h3>
+          <ul class="list-disc pl-5 space-y-2">
+            <li>FDA-approved for treating dandruff and psoriasis.</li>
+            <li>Reduces DNA synthesis in skin cells.</li>
+            <li>Available in 0.5% to 5% concentrations.</li>
+          </ul>
+        </div>
       `,
-      featuredImage: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&q=80&w=1000',
-      isFeatured: true,
+      featuredImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDT3hM601uT4HcJnG5I3CPNyMmDKh77rGz307sUN2rGxQ5eqoxnEkngqSt_CyxuSl1WrfuHb25vCNICNgXyYCSESWT-_tP4AXow4HJvk_jSP4rVgYZKTlIP1dDej5GfJymvv4zJrSCEGwFSL1Oq1Vhnna50bfprt6OAIbCmb_RjmrnsZLT5yfeyHp09-SkLZW0mmyZGOCsP7FoNinsBDxsR-q1vSgt0mvg_IVl1FYO4bqaObWqMl-ggVK82VCkLCXesdaAbaDMpwGl5',
       status: 'PUBLISHED',
       publishedAt: new Date(),
       authorId: admin.id,
+      medicalReviewerId: dermatologist.id,
+      verificationStatus: 'VERIFIED',
       tenantId: tenant.id,
-      categories: {
-        create: [{ categoryId: tech.id }],
-      },
-      tags: {
-        create: [{ tagId: nextjs.id }, { tagId: tailwind.id }],
-      },
+      faqSchema: [
+        { question: 'How often should I use coal tar products?', answer: 'Most dermatologists recommend 2-3 times per week initially.' },
+        { question: 'Is coal tar safe for color-treated hair?', answer: 'It can cause temporary staining of light-colored hair.' }
+      ],
+      categories: { create: [{ categoryId: haircare.id }, { categoryId: ingredients.id }] },
+      tags: { create: [{ tagId: psoriasis.id }] },
     },
+  });
+
+  // Create API Integration
+  await prisma.apiIntegration.create({
+    data: {
+      name: 'Clinikally Products',
+      serviceType: 'Inventory',
+      apiKey: 'dc_live_xxxxxxxxxxxx2k94',
+      status: true,
+      tenantId: tenant.id,
+      activities: {
+        create: [
+          { type: 'Sync Success', description: 'Updated 24 items successfully.' },
+          { type: 'Connection Established', description: 'Integration was established.' }
+        ]
+      }
+    }
   });
 
   console.log('Seed completed successfully');

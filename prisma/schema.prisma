@@ -10,6 +10,7 @@ datasource db {
 enum Role {
   ADMIN
   EDITOR
+  REVIEWER
 }
 
 enum PostStatus {
@@ -17,51 +18,66 @@ enum PostStatus {
   PUBLISHED
 }
 
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
 model Tenant {
-  id          String     @id @default(cuid())
-  name        String
-  slug        String     @unique
-  users       User[]
-  posts       Post[]
-  categories  Category[]
-  tags        Tag[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id              String           @id @default(cuid())
+  name            String
+  slug            String           @unique
+  users           User[]
+  posts           Post[]
+  categories      Category[]
+  tags            Tag[]
+  apiIntegrations ApiIntegration[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String?
-  email     String   @unique
-  password  String
-  role      Role     @default(EDITOR)
-  posts     Post[]
-  tenantId  String
-  tenant    Tenant   @relation(fields: [tenantId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String         @id @default(cuid())
+  name           String?
+  email          String         @unique
+  password       String
+  image          String?
+  role           Role           @default(EDITOR)
+  posts          Post[]         @relation("Author")
+  reviewedPosts  Post[]         @relation("MedicalReviewer")
+  tenantId       String
+  tenant         Tenant         @relation(fields: [tenantId], references: [id])
+  postVersions   PostVersion[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 }
 
 model Post {
-  id              String         @id @default(cuid())
-  title           String
-  slug            String
-  excerpt         String?
-  content         String         @db.Text
-  featuredImage   String?
-  isFeatured      Boolean        @default(false)
-  status          PostStatus     @default(DRAFT)
-  metaTitle       String?
-  metaDescription String?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  publishedAt     DateTime?
-  author          User           @relation(fields: [authorId], references: [id])
-  authorId        String
-  tenantId        String
-  tenant          Tenant         @relation(fields: [tenantId], references: [id])
-  categories      PostCategory[]
-  tags            PostTag[]
+  id                 String             @id @default(cuid())
+  title              String
+  slug               String
+  excerpt            String?
+  content            String             @db.Text
+  featuredImage      String?
+  isFeatured         Boolean            @default(false)
+  status             PostStatus         @default(DRAFT)
+  metaTitle          String?
+  metaDescription    String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  publishedAt        DateTime?
+  author             User               @relation("Author", fields: [authorId], references: [id])
+  authorId           String
+  medicalReviewer    User?              @relation("MedicalReviewer", fields: [medicalReviewerId], references: [id])
+  medicalReviewerId  String?
+  verificationStatus VerificationStatus @default(PENDING)
+  faqSchema          Json?
+  tenantId           String
+  tenant             Tenant             @relation(fields: [tenantId], references: [id])
+  categories         PostCategory[]
+  tags               PostTag[]
+  versions           PostVersion[]
 
   @@unique([slug, tenantId])
 }
@@ -104,4 +120,42 @@ model PostTag {
   tag    Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([postId, tagId])
+}
+
+model PostVersion {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  content   String   @db.Text
+  title     String
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  feedback  String?
+  version   String
+  createdAt DateTime @default(now())
+}
+
+model ApiIntegration {
+  id          String        @id @default(cuid())
+  name        String
+  serviceType String
+  status      Boolean       @default(true)
+  apiKey      String?
+  secretKey   String?
+  environment String        @default("SANDBOX")
+  baseUrl     String?
+  webhookUrl  String?
+  lastSync    DateTime?
+  tenantId    String
+  tenant      Tenant        @relation(fields: [tenantId], references: [id])
+  activities  ApiActivity[]
+}
+
+model ApiActivity {
+  id          String         @id @default(cuid())
+  apiId       String
+  api         ApiIntegration @relation(fields: [apiId], references: [id], onDelete: Cascade)
+  type        String
+  description String
+  createdAt   DateTime       @default(now())
 }

@@ -4,8 +4,6 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
-import { Button } from '@/components/ui/Button';
-import { Bold, Italic, List, ListOrdered, Link as LinkIcon, Image as ImageIcon } from 'lucide-react';
 
 interface TipTapEditorProps {
   content: string;
@@ -25,6 +23,7 @@ export default function TipTapEditor({ content, onChange }: TipTapEditorProps) {
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
+    immediatelyRender: false,
   });
 
   if (!editor) {
@@ -46,52 +45,49 @@ export default function TipTapEditor({ content, onChange }: TipTapEditorProps) {
   };
 
   return (
-    <div className="rounded-md border border-gray-300 bg-white">
-      <div className="flex flex-wrap items-center gap-1 border-b p-2">
-        <Button
+    <div className="flex flex-col border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden mb-8">
+      <div className="flex flex-wrap items-center gap-1 p-2 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+        <button
           type="button"
-          variant="ghost"
-          size="sm"
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={editor.isActive('bold') ? 'bg-gray-200' : ''}
+          className={`p-2 hover:bg-white dark:hover:bg-slate-800 rounded text-slate-600 dark:text-slate-300 ${editor.isActive('bold') ? 'bg-white dark:bg-slate-800' : ''}`}
         >
-          <Bold className="h-4 w-4" />
-        </Button>
-        <Button
+          <span className="material-symbols-outlined text-[20px]">format_bold</span>
+        </button>
+        <button
           type="button"
-          variant="ghost"
-          size="sm"
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={editor.isActive('italic') ? 'bg-gray-200' : ''}
+          className={`p-2 hover:bg-white dark:hover:bg-slate-800 rounded text-slate-600 dark:text-slate-300 ${editor.isActive('italic') ? 'bg-white dark:bg-slate-800' : ''}`}
         >
-          <Italic className="h-4 w-4" />
-        </Button>
-        <Button
+          <span className="material-symbols-outlined text-[20px]">format_italic</span>
+        </button>
+        <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1"></div>
+        <button
           type="button"
-          variant="ghost"
-          size="sm"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={editor.isActive('bulletList') ? 'bg-gray-200' : ''}
+          className={`p-2 hover:bg-white dark:hover:bg-slate-800 rounded text-slate-600 dark:text-slate-300 ${editor.isActive('bulletList') ? 'bg-white dark:bg-slate-800' : ''}`}
         >
-          <List className="h-4 w-4" />
-        </Button>
-        <Button
+          <span className="material-symbols-outlined text-[20px]">format_list_bulleted</span>
+        </button>
+        <button
           type="button"
-          variant="ghost"
-          size="sm"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={editor.isActive('orderedList') ? 'bg-gray-200' : ''}
+          className={`p-2 hover:bg-white dark:hover:bg-slate-800 rounded text-slate-600 dark:text-slate-300 ${editor.isActive('orderedList') ? 'bg-white dark:bg-slate-800' : ''}`}
         >
-          <ListOrdered className="h-4 w-4" />
-        </Button>
-        <Button type="button" variant="ghost" size="sm" onClick={addLink} className={editor.isActive('link') ? 'bg-gray-200' : ''}>
-          <LinkIcon className="h-4 w-4" />
-        </Button>
-        <Button type="button" variant="ghost" size="sm" onClick={addImage}>
-          <ImageIcon className="h-4 w-4" />
-        </Button>
+          <span className="material-symbols-outlined text-[20px]">format_list_numbered</span>
+        </button>
+        <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1"></div>
+        <button type="button" onClick={addLink} className={`p-2 hover:bg-white dark:hover:bg-slate-800 rounded text-slate-600 dark:text-slate-300 ${editor.isActive('link') ? 'bg-white dark:bg-slate-800' : ''}`}>
+          <span className="material-symbols-outlined text-[20px]">link</span>
+        </button>
+        <button type="button" onClick={addImage} className="p-2 hover:bg-white dark:hover:bg-slate-800 rounded text-slate-600 dark:text-slate-300">
+          <span className="material-symbols-outlined text-[20px]">image</span>
+        </button>
+        <button type="button" className="p-2 hover:bg-white dark:hover:bg-slate-800 rounded text-slate-600 dark:text-slate-300 ml-auto">
+          <span className="material-symbols-outlined text-[20px]">code</span>
+        </button>
       </div>
-      <EditorContent editor={editor} className="prose max-w-none p-4 min-h-[300px] focus:outline-none" />
+      <EditorContent editor={editor} className="p-6 min-h-[500px] prose dark:prose-invert max-w-none focus:outline-none" />
     </div>
   );
 }
