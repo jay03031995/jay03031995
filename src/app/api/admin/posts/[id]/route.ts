@@ -18,6 +18,7 @@ export async function GET(
       include: {
         categories: { select: { categoryId: true } },
         tags: { select: { tagId: true } },
+        medicalReviewer: { select: { id: true, name: true } },
       },
     });
 
@@ -40,7 +41,21 @@ export async function PUT(
 
   try {
     const body = await request.json();
-    const { title, content, excerpt, featuredImage, isFeatured, status, metaTitle, metaDescription, categoryIds, tagIds } = body;
+    const {
+      title,
+      content,
+      excerpt,
+      featuredImage,
+      isFeatured,
+      status,
+      metaTitle,
+      metaDescription,
+      categoryIds,
+      tagIds,
+      medicalReviewerId,
+      verificationStatus,
+      faqSchema
+    } = body;
 
     const existingPost = await prisma.post.findFirst({
       where: { id, tenantId: session.tenantId },
@@ -56,6 +71,19 @@ export async function PUT(
       publishedAt = new Date();
     }
 
+    // Create a new version before updating if content changed
+    if (content !== existingPost.content || title !== existingPost.title) {
+      await prisma.postVersion.create({
+        data: {
+          postId: existingPost.id,
+          title: existingPost.title,
+          content: existingPost.content,
+          authorId: session.userId,
+          version: `v${Date.now()}`, // Simple versioning for demo
+        }
+      });
+    }
+
     const post = await prisma.post.update({
       where: { id },
       data: {
@@ -69,6 +97,9 @@ export async function PUT(
         metaTitle,
         metaDescription,
         publishedAt,
+        medicalReviewerId,
+        verificationStatus,
+        faqSchema,
         categories: {
           deleteMany: {},
           create: categoryIds?.map((id: string) => ({ categoryId: id })) || [],
