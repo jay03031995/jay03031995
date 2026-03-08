@@ -32,3 +32,14 @@ body {
 .fill-1 {
   font-variation-settings: 'FILL' 1 !important;
 }
+
+@font-face {
+  font-family: 'Montserrat';
+  src: local('Montserrat');
+}
+
+@layer base {
+  .font-montserrat {
+    font-family: var(--font-montserrat), sans-serif;
+  }
+}

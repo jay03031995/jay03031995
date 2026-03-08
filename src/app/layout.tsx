@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Montserrat, Inter } from "next/font/google";
+import { Toaster } from 'react-hot-toast';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,18 +13,22 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
+  subsets: ["latin"],
+});
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   title: {
-    default: "The Blog | Insights & Stories",
-    template: "%s | The Blog"
+    default: "GeoSwift | Fast CSV Geocoding",
+    template: "%s | GeoSwift"
   },
-  description: "A production-ready blog platform built with Next.js and Prisma.",
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "https://blog.example.com",
-    siteName: "The Blog",
-  },
+  description: "Bulk geocoding and reverse geocoding for your CSV data.",
 };
 
 export default function RootLayout({
@@ -34,8 +39,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} ${inter.variable} antialiased`}
       >
+        <Toaster position="top-right" />
         {children}
       </body>
     </html>
