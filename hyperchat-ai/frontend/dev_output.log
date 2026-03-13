@@ -1,0 +1,22 @@
+
+> frontend@0.1.0 dev
+> next dev
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /app/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles:
+   * /app/hyperchat-ai/frontend/package-lock.json
+
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+
+✓ Starting...
+✓ Ready in 1106ms
+○ Compiling / ...
+ GET / 200 in 6.8s (compile: 6.1s, render: 693ms)
+ GET / 200 in 84ms (compile: 8ms, render: 77ms)
+ GET /dashboard/inbox 200 in 1152ms (compile: 1064ms, render: 87ms)
+ GET /dashboard/training 200 in 794ms (compile: 707ms, render: 87ms)
