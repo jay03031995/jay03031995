@@ -17,16 +17,24 @@ enum PostStatus {
   PUBLISHED
 }
 
+enum CalendarStatus {
+  PENDING
+  ASSIGNED
+  COMPLETED
+}
+
 model Tenant {
-  id          String     @id @default(cuid())
-  name        String
-  slug        String     @unique
-  users       User[]
-  posts       Post[]
-  categories  Category[]
-  tags        Tag[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id               String            @id @default(cuid())
+  name             String
+  slug             String            @unique
+  users            User[]
+  posts            Post[]
+  categories       Category[]
+  tags             Tag[]
+  clients          Client[]
+  calendarEntries  ContentCalendar[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 }
 
 model User {
@@ -36,10 +44,43 @@ model User {
   password  String
   role      Role     @default(EDITOR)
   posts     Post[]
+  clients   Client[]
   tenantId  String
   tenant    Tenant   @relation(fields: [tenantId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Client {
+  id              String            @id @default(cuid())
+  name            String
+  oneDriveFolder  String?           // Path or ID of the client's folder in OneDrive
+  editorId        String?
+  editor          User?             @relation(fields: [editorId], references: [id])
+  calendarEntries ContentCalendar[]
+  tenantId        String
+  tenant          Tenant            @relation(fields: [tenantId], references: [id])
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@unique([name, tenantId])
+}
+
+model ContentCalendar {
+  id            String         @id @default(cuid())
+  date          DateTime
+  videoTopic    String
+  platform      String
+  status        CalendarStatus @default(PENDING)
+  videoUrl      String?        // Link to the assigned video in OneDrive
+  clientId      String
+  client        Client         @relation(fields: [clientId], references: [id])
+  tenantId      String
+  tenant        Tenant         @relation(fields: [tenantId], references: [id])
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([date])
 }
 
 model Post {
